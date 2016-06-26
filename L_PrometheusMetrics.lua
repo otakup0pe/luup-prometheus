@@ -15,6 +15,15 @@
     along with luup-prometheus.  If not, see <http://www.gnu.org/licenses/>.
 --]]
 
+function tcontains(table, test)
+    for k, v in pairs(table) do
+        if v == test then
+            return true
+        end
+    end
+    return false
+end
+
 function pm_metric(name, attributes, value)
     -- Format a metric for Prometheus text output
     local attrs = ''
@@ -36,17 +45,19 @@ function pm_attributes(device_num, device)
     return a
 end
 
-function prometheus_metric(device_cat, service, variable, metric_name, help, mtype)
+function prometheus_metric(device_cats, service, variable, metric_name, help, mtype)
     -- Return a fully formatted metric for all devices in device_cat
     if not mtype then mtype = 'gauge' end
 
     local output = ''
 
     for device_num, device in pairs(luup.devices) do
-        if device.category_num == device_cat then
+        if tcontains(device_cats, device.category_num) then
             local v = luup.variable_get(service, variable, device_num)
-            local a = pm_attributes(device_num, device)
-            output = output .. pm_metric(metric_name, a, v)
+            if v then
+                local a = pm_attributes(device_num, device)
+                output = output .. pm_metric(metric_name, a, v)
+            end
         end
     end
 
@@ -62,7 +73,7 @@ end
 
 function pm_temperature()
     return prometheus_metric(
-        17,
+        {5, 17},
         'urn:upnp-org:serviceId:TemperatureSensor1',
         'CurrentTemperature',
         'temperature_c',
@@ -72,7 +83,7 @@ end
 
 function pm_light()
     return prometheus_metric(
-        18,
+        {18},
         'urn:micasaverde-com:serviceId:LightSensor1',
         'CurrentLevel',
         'light_lux',
@@ -82,7 +93,7 @@ end
 
 function pm_humidity()
     return prometheus_metric(
-        16,
+        {16},
         'urn:micasaverde-com:serviceId:HumiditySensor1',
         'CurrentLevel',
         'humidity_relative',

@@ -81,7 +81,7 @@ function pm_temperature()
     )
 end
 
-function pm_light()
+function pm_light_sensors()
     return prometheus_metric(
         {18},
         'urn:micasaverde-com:serviceId:LightSensor1',
@@ -101,14 +101,25 @@ function pm_humidity()
     )
 end
 
+function pm_light_bulbs()
+    return prometheus_metric(
+        {2},
+        'urn:upnp-org:serviceId:Dimming1',
+        'LoadLevelStatus',
+        'dimmable_load_percent',
+        'Load level of a dimmable device (0..100)'
+    )
+end
+
 function prometheus_metrics_handler(lul_request, lul_parameters, lul_outputformat)
     local output = ''
     -- Unfortunately the Prometheus output format requires all lines for
     -- a given metric must be in one group, so we end up iterating luup.devices
     -- once for each device type that we wan to handle.
     output = output .. pm_temperature()
-    output = output .. pm_light()
+    output = output .. pm_light_sensors()
     output = output .. pm_humidity()
+    output = output .. pm_light_bulbs()
     return output, 'text/plain'
 end
 

@@ -8,8 +8,18 @@ exporter.
 
 ## Exported metrics
 
-Currently gauge metrics are exported for temperature, humidity and light
-sensors.
+The plugin currently exports gauge metrics for a few different types of
+sensors and devices:
+
+Sensors:
+
+ - Temperature sensors: `temperature_c`
+ - Humidity sensors: `humidity_relative`
+ - Light sensors: `light_lux`
+
+Devices:
+
+ - Dimmable bulbs: `dimmable_load_percent`
 
 ## Installation
 

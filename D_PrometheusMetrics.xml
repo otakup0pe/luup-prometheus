@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<root xmlns="urn:schemas-upnp-org:device-1-0">
+  <specVersion>
+    <major>1</major>
+    <minor>0</minor>
+  </specVersion>
+  <device>
+    <deviceType>urn:schemas-upnp-org:device:prometheusmetrics:1</deviceType>
+    <staticJson>D_PrometheusMetrics.json</staticJson>
+    <friendlyName>Prometheus Metrics</friendlyName>
+    <manufacturer>rcloran</manufacturer>
+    <manufacturerURL>http://github.com/rcloran</manufacturerURL>
+    <modelDescription>Prometheus Metrics plugin for Vera</modelDescription>
+    <modelName>Prometheus Metrics plugin for Vera</modelName>
+    <modelNumber>1</modelNumber>
+    <protocol>cr</protocol>
+    <handleChildren>0</handleChildren>
+    <serviceList>
+      <service>
+        <serviceType>urn:schemas-upnp-org:service:prometheusmetrics:1</serviceType>
+        <serviceId>urn:upnp-org:serviceId:prometheusmetrics1</serviceId>
+        <SCPDURL>S_PrometheusMetrics.xml</SCPDURL>
+      </service>
+    </serviceList>
+    <implementationList>
+      <implementationFile>I_PrometheusMetrics.xml</implementationFile>
+    </implementationList>
+  </device>
+</root>

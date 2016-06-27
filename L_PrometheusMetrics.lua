@@ -111,6 +111,61 @@ function pm_light_bulbs()
     )
 end
 
+function pm_procstat_one(line, expected, mname, help, mtype)
+    local output = ''
+    local label = ''
+    local value = ''
+    label, value = line:match('(' .. expected .. ') (%d+)')
+    if label ~= expected then return '' end
+    mname = 'node_' .. mname
+    value = tonumber(value)
+    output = output .. '# HELP ' .. mname .. ' ' .. help .. '\n'
+    output = output .. '# TYPE ' .. mname .. ' ' .. mtype .. '\n'
+    output = output .. pm_metric(mname, nil, value)
+
+    return output
+end
+
+function pm_procstat()
+    local f = io.open('/proc/stat', 'rb')
+    if not f then return '' end
+
+    local output = '# HELP node_cpu Seconds the cpus spent in each mode.\n'
+    output = output .. '# TYPE node_cpu counter\n'
+
+    -- First line is overall CPU stats - ignore
+    _ = f:read()
+    local cpu_attrs = {'user', 'nice', 'system', 'idle', 'iowait', 'irq',
+                       'softirq', 'steal', 'guest', 'guest_nice'}
+    local _sc_clk_tck = 100 -- Should be read from sysconf
+    local line = f:read()
+    while string.sub(line, 1, 3) == 'cpu' do
+        local stats = {line:match('(cpu%d+) (%d+) (%d+) (%d+) (%d+)( ?%d*)( ?%d*)( ?%d*)( ?%d*)( ?%d*)( ?%d*)')}
+        for k, mode in pairs(cpu_attrs) do
+            local v = tonumber(stats[k + 1])
+            if not v then break end
+
+            local attrs = {cpu=stats[1], mode=mode}
+            output = output .. pm_metric('node_cpu', attrs, v / _sc_clk_tck)
+        end
+        line = f:read()
+    end
+
+    output = output .. pm_procstat_one(line, 'intr', 'intr', 'Total number of interrupts serviced.', 'counter')
+    line = f:read()
+    output = output .. pm_procstat_one(line, 'ctxt', 'context_switches', 'Total number of context switches.', 'counter')
+    line = f:read()
+    output = output .. pm_procstat_one(line, 'btime', 'boot_time', 'Node boot time, in unixtime.', 'gauge')
+    line = f:read()
+    output = output .. pm_procstat_one(line, 'processes', 'forks', 'Total number of forks.', 'counter')
+    line = f:read()
+    output = output .. pm_procstat_one(line, 'procs_running', 'procs_running', 'Number of processes in runnable state.', 'gauge')
+    line = f:read()
+    output = output .. pm_procstat_one(line, 'procs_blocked', 'procs_blocked', 'Number of processes blocked waiting for I/O to complete.', 'gauge')
+
+    f:close()
+    return output
+end
 function prometheus_metrics_handler(lul_request, lul_parameters, lul_outputformat)
     local output = ''
     -- Unfortunately the Prometheus output format requires all lines for
@@ -120,6 +175,7 @@ function prometheus_metrics_handler(lul_request, lul_parameters, lul_outputforma
     output = output .. pm_light_sensors()
     output = output .. pm_humidity()
     output = output .. pm_light_bulbs()
+    output = output .. pm_procstat()
     return output, 'text/plain'
 end
 

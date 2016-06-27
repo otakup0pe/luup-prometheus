@@ -21,6 +21,13 @@ Devices:
 
  - Dimmable bulbs: `dimmable_load_percent`
 
+System:
+
+ - Various system metrics from `/proc/stat`, attempting to be compatible with
+ the Prometheus `node_exporter` exporter (`node_cpu`, `node_intr`,
+ `node_context_switches`, `node_boot_time`, `node_forks`,
+ `node_procs_running`, `node_procs_blocked`)
+
 ## Installation
 
 Upload all of the `.xml` and `.lua` files in this repository to your Vera

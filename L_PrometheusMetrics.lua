@@ -166,6 +166,29 @@ function pm_procstat()
     f:close()
     return output
 end
+
+function pm_meminfo()
+    local f = io.open('/proc/meminfo', 'rb')
+    if not f then return '' end
+
+    local output = ''
+    for line in f:lines() do
+        local field, value, unit = line:match('(.+): +(%d+)( ?k?B?)')
+        if not field and not value then break end
+
+        value = tonumber(value)
+        if unit == ' kB' then value = value * 1024 end
+
+        field = field:gsub('%((.+)%)', '_%1')
+        local mname = 'node_memory_' .. field
+        output = output .. '# HELP ' .. mname .. ' Memory information field ' .. field .. '\n'
+        output = output .. '# TYPE ' .. mname .. ' gauge\n'
+        output = output .. pm_metric(mname, nil, value)
+    end
+
+    return output
+end
+
 function prometheus_metrics_handler(lul_request, lul_parameters, lul_outputformat)
     local output = ''
     -- Unfortunately the Prometheus output format requires all lines for
@@ -176,6 +199,7 @@ function prometheus_metrics_handler(lul_request, lul_parameters, lul_outputforma
     output = output .. pm_humidity()
     output = output .. pm_light_bulbs()
     output = output .. pm_procstat()
+    output = output .. pm_meminfo()
     return output, 'text/plain'
 end
 

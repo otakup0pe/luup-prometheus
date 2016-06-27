@@ -27,6 +27,8 @@ System:
  the Prometheus `node_exporter` exporter (`node_cpu`, `node_intr`,
  `node_context_switches`, `node_boot_time`, `node_forks`,
  `node_procs_running`, `node_procs_blocked`)
+ - Various system metrics from `/proc/meminfo`, attempting to be compatible
+ with the Prometheus `node_exporter` exporter (`node_memory_*`)
 
 ## Installation
 

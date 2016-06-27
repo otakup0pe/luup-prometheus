@@ -189,6 +189,33 @@ function pm_meminfo()
     return output
 end
 
+function pm_process_procstat()
+    -- Metrics about this process
+    local f = io.open('/proc/self/stat', 'rb')
+    if not f then return '' end
+
+    local contents = f:read()
+    local pattern = '(%d+) %((.-)%) (.)' .. string.rep(" ([-%d]+)", 21)
+    local data = {contents:match(pattern)}
+    local fields = {utime=14, stime=15, vsize=23, rss=24}
+
+    local cputime = (data[fields.utime] + data[fields.stime]) / 100
+    local output = '# HELP process_cpu_seconds_total Total user and system CPU time spent in seconds.\n'
+    output = output .. '# TYPE process_cpu_seconds_total counter\n'
+    output = output .. pm_metric('process_cpu_seconds_total', nil, cputime)
+
+    local rss = data[fields.rss] * 4096
+    output = output .. '# HELP process_resident_memory_bytes Resident memory size in bytes.\n'
+    output = output .. '# TYPE process_resident_memory_bytes gauge\n'
+    output = output .. pm_metric('process_resident_memory_bytes', nil, rss)
+
+    output = output .. '# HELP process_virtual_memory_bytes Virtual memory size in bytes.\n'
+    output = output .. '# TYPE process_virtual_memory_bytes gauge\n'
+    output = output .. pm_metric('process_virtual_memory_bytes', nil, data[fields.vsize])
+
+    return output
+end
+
 function prometheus_metrics_handler(lul_request, lul_parameters, lul_outputformat)
     local output = ''
     -- Unfortunately the Prometheus output format requires all lines for
@@ -200,6 +227,7 @@ function prometheus_metrics_handler(lul_request, lul_parameters, lul_outputforma
     output = output .. pm_light_bulbs()
     output = output .. pm_procstat()
     output = output .. pm_meminfo()
+    output = output .. pm_process_procstat()
     return output, 'text/plain'
 end
 

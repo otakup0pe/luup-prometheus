@@ -29,6 +29,10 @@ System:
  `node_procs_running`, `node_procs_blocked`)
  - Various system metrics from `/proc/meminfo`, attempting to be compatible
  with the Prometheus `node_exporter` exporter (`node_memory_*`)
+ - Some metrics about the LuaUPnP process itself from `/proc/self/stat`,
+ attempting to be compatible with the golang Prometheus client library (
+ `process_cpu_seconds_total`, `process_resident_memory_bytes`,
+ `process_virtual_memory_bytes`)
 
 ## Installation
 

@@ -15,14 +15,33 @@
     along with luup-prometheus.  If not, see <http://www.gnu.org/licenses/>.
 --]]
 
-function tcontains(table, test)
-    for k, v in pairs(table) do
-        if v == test then
-            return true
-        end
+local DATA = {
+    humidity_sensor={
+        {{16}, 'urn:micasaverde-com:serviceId:HumiditySensor1', 'CurrentLevel'},
+        {'humidity_relative', 'Relative humidity (0..100)'}
+    },
+    light_sensor={
+        {{18}, 'urn:micasaverde-com:serviceId:LightSensor1', 'CurrentLevel'},
+        {'light_lux', 'Light level in lux'}
+    },
+    temperature_sensor={
+        {{5, 17}, 'urn:upnp-org:serviceId:TemperatureSensor1', 'CurrentTemperature'},
+        {'temperature_c', 'Temperature in degrees Celsius'}
+    },
+
+    dimmer_state={
+        {{2}, 'urn:upnp-org:serviceId:Dimming1', 'LoadLevelStatus'},
+        {'dimmable_load_percent', 'Load level of a dimmable device (0..100)'}
+    },
+}
+local DATA_BY_CAT = {}
+for key, data in pairs(DATA) do
+    for _, cat in ipairs(data[1][1]) do
+        DATA_BY_CAT[cat] = DATA_BY_CAT[cat] or {}
+        table.insert(DATA_BY_CAT[cat], key)
     end
-    return false
 end
+
 
 function pm_metric(name, attributes, value)
     -- Format a metric for Prometheus text output
@@ -45,70 +64,35 @@ function pm_attributes(device_num, device)
     return a
 end
 
-function prometheus_metric(device_cats, service, variable, metric_name, help, mtype)
-    -- Return a fully formatted metric for all devices in device_cat
-    if not mtype then mtype = 'gauge' end
-
+function pm_device_metrics()
     local output = ''
 
+    local metrics = {}
     for device_num, device in pairs(luup.devices) do
-        if tcontains(device_cats, device.category_num) then
-            local v = luup.variable_get(service, variable, device_num)
-            if v then
-                local a = pm_attributes(device_num, device)
-                output = output .. pm_metric(metric_name, a, v)
-            end
+        for _, data_key in ipairs(DATA_BY_CAT[device.category_num] or {}) do
+            local d = DATA[data_key]
+            metrics[data_key] = metrics[data_key] or {}
+            table.insert(metrics[data_key], {
+                luup.variable_get(d[1][2], d[1][3], device_num),
+                pm_attributes(device_num, device)
+            })
         end
     end
 
-    if output == '' then
-        return output
+    local output = ''
+    for data_key, values in pairs(metrics) do
+        local mname = DATA[data_key][2][1]
+        local mhelp = DATA[data_key][2][2]
+        local mtype = DATA[data_key][2][3] or 'gauge'
+        output = output .. '# HELP ' .. mname .. ' ' .. mhelp .. "\n"
+        output = output .. '# TYPE ' .. mname .. ' ' .. mtype .. "\n"
+
+        for _, v in ipairs(values) do
+            output = output .. pm_metric(mname, v[2], v[1])
+        end
     end
 
-    output = '# TYPE ' .. metric_name .. ' ' .. mtype .. "\n" .. output
-    output = '# HELP ' .. metric_name .. ' ' .. help .. "\n" .. output
-
     return output
-end
-
-function pm_temperature()
-    return prometheus_metric(
-        {5, 17},
-        'urn:upnp-org:serviceId:TemperatureSensor1',
-        'CurrentTemperature',
-        'temperature_c',
-        'Temperature in degrees Celsius'
-    )
-end
-
-function pm_light_sensors()
-    return prometheus_metric(
-        {18},
-        'urn:micasaverde-com:serviceId:LightSensor1',
-        'CurrentLevel',
-        'light_lux',
-        'Light level in lux'
-    )
-end
-
-function pm_humidity()
-    return prometheus_metric(
-        {16},
-        'urn:micasaverde-com:serviceId:HumiditySensor1',
-        'CurrentLevel',
-        'humidity_relative',
-        'Relative humidity (0..100)'
-    )
-end
-
-function pm_light_bulbs()
-    return prometheus_metric(
-        {2},
-        'urn:upnp-org:serviceId:Dimming1',
-        'LoadLevelStatus',
-        'dimmable_load_percent',
-        'Load level of a dimmable device (0..100)'
-    )
 end
 
 function pm_procstat_one(line, expected, mname, help, mtype)
@@ -217,14 +201,8 @@ function pm_process_procstat()
 end
 
 function prometheus_metrics_handler(lul_request, lul_parameters, lul_outputformat)
-    local output = ''
-    -- Unfortunately the Prometheus output format requires all lines for
-    -- a given metric must be in one group, so we end up iterating luup.devices
-    -- once for each device type that we wan to handle.
-    output = output .. pm_temperature()
-    output = output .. pm_light_sensors()
-    output = output .. pm_humidity()
-    output = output .. pm_light_bulbs()
+    local output = pm_device_metrics()
+
     output = output .. pm_procstat()
     output = output .. pm_meminfo()
     output = output .. pm_process_procstat()

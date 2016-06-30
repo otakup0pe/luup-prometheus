@@ -8,7 +8,7 @@ exporter.
 
 ## Exported metrics
 
-The plugin currently exports gauge metrics for a few different types of
+The plugin currently exports metrics for a few different types of
 sensors and devices:
 
 Sensors:
@@ -16,6 +16,8 @@ Sensors:
  - Temperature sensors: `temperature_c`
  - Humidity sensors: `humidity_relative`
  - Light sensors: `light_lux`
+ - Energy/electricity usage sensors: `electricity_used_kwh`,
+ `electricity_usage_w`
 
 Devices:
 

@@ -16,6 +16,14 @@
 --]]
 
 local DATA = {
+    energy_sensor_counter={
+        {{3}, 'urn:micasaverde-com:serviceId:EnergyMetering1', 'KWH'},
+        {'electricity_used_kwh', 'Electricity used by this device in KWh', 'counter'}
+    },
+    energy_sensor_gauge={
+        {{3}, 'urn:micasaverde-com:serviceId:EnergyMetering1', 'Watts'},
+        {'electricity_usage_w', 'Currently reported electricity draw in Watts'}
+    },
     humidity_sensor={
         {{16}, 'urn:micasaverde-com:serviceId:HumiditySensor1', 'CurrentLevel'},
         {'humidity_relative', 'Relative humidity (0..100)'}

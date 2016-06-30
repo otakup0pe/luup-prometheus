@@ -18,6 +18,7 @@ Sensors:
  - Light sensors: `light_lux`
  - Energy/electricity usage sensors: `electricity_used_kwh`,
  `electricity_usage_w`
+ - Battery level: `battery_level_percent`
 
 Devices:
 

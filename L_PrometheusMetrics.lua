@@ -36,6 +36,10 @@ local DATA = {
         {{18}, 'urn:micasaverde-com:serviceId:LightSensor1', 'CurrentLevel'},
         {'light_lux', 'Light level in lux'}
     },
+    security_sensor={
+        {{4}, 'urn:micasaverde-com:serviceId:SecuritySensor1', 'Tripped'},
+        {'security_sensor_tripped', 'Integer 1/0 indicating sensor trip'}
+    },
     temperature_sensor={
         {{5, 17}, 'urn:upnp-org:serviceId:TemperatureSensor1', 'CurrentTemperature'},
         {'temperature_c', 'Temperature in degrees Celsius'}

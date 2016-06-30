@@ -79,11 +79,15 @@ function pm_device_metrics()
     for device_num, device in pairs(luup.devices) do
         for _, data_key in ipairs(DATA_BY_CAT[device.category_num] or {}) do
             local d = DATA[data_key]
-            metrics[data_key] = metrics[data_key] or {}
-            table.insert(metrics[data_key], {
-                luup.variable_get(d[1][2], d[1][3], device_num),
-                pm_attributes(device_num, device)
-            })
+            local value = luup.variable_get(d[1][2], d[1][3], device_num)
+            value = tonumber(value)
+            if value then
+                metrics[data_key] = metrics[data_key] or {}
+                table.insert(metrics[data_key], {
+                    luup.variable_get(d[1][2], d[1][3], device_num),
+                    pm_attributes(device_num, device)
+                })
+            end
         end
     end
 

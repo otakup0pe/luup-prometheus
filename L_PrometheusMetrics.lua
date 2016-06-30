@@ -74,10 +74,11 @@ end
 
 function pm_attributes(device_num, device)
     -- Return a basic set of attributes for a device
-    local a = {}
-    a.room = luup.rooms[device.room_num]
-    a.device = device_num
-    return a
+    return {
+        description=device.description,
+        device=device_num,
+        room=luup.rooms[device.room_num]
+   }
 end
 
 function pm_device_metrics()

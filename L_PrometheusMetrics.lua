@@ -84,18 +84,30 @@ end
 function pm_device_metrics()
     local output = ''
 
-    local metrics = {}
+    -- Sort devices by device_num
+    local sorted_devices = {}
     for device_num, device in pairs(luup.devices) do
+        table.insert(sorted_devices, device_num)
+    end
+    table.sort(sorted_devices)
+
+
+    local metrics = {}
+    for _, device_num in ipairs(sorted_devices) do
+        device = luup.devices[device_num]
         for _, data_key in ipairs(DATA_BY_CAT[device.category_num] or {}) do
             local d = DATA[data_key]
             local value = luup.variable_get(d[1][2], d[1][3], device_num)
             value = tonumber(value)
             if value then
                 metrics[data_key] = metrics[data_key] or {}
-                table.insert(metrics[data_key], {
+                if device.device_num_parent then
+                    metrics[data_key][device.device_num_parent] = nil
+                end
+                metrics[data_key][device_num] = {
                     luup.variable_get(d[1][2], d[1][3], device_num),
                     pm_attributes(device_num, device)
-                })
+                }
             end
         end
     end
@@ -108,7 +120,7 @@ function pm_device_metrics()
         output = output .. '# HELP ' .. mname .. ' ' .. mhelp .. "\n"
         output = output .. '# TYPE ' .. mname .. ' ' .. mtype .. "\n"
 
-        for _, v in ipairs(values) do
+        for _, v in pairs(values) do
             output = output .. pm_metric(mname, v[2], v[1])
         end
     end

@@ -67,7 +67,7 @@ is needed. An example snippet to add to the `scrape_configs` section of your
   - job_name: 'vera'
     scrape_interval: 15s
     metrics_path: /data_request?id=lr_prometheus_metrics
-    target_groups:
+    static_configs:
       - targets: ['192.168.8.68:49451']
 ```
 

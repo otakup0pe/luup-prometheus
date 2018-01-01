@@ -33,7 +33,7 @@ local DATA = {
         {'humidity_relative', 'Relative humidity (0..100)'}
     },
     light_sensor={
-        {{18}, 'urn:micasaverde-com:serviceId:LightSensor1', 'CurrentLevel'},
+        {{11, 18}, 'urn:micasaverde-com:serviceId:LightSensor1', 'CurrentLevel'},
         {'light_lux', 'Light level in lux'}
     },
     security_sensor={

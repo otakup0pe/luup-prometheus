@@ -17,7 +17,7 @@
 
 local DATA = {
     battery_level={
-        {{4}, 'urn:micasaverde-com:serviceId:HaDevice1', 'BatteryLevel'},
+        {{3, 4, 7, 11, 12}, 'urn:micasaverde-com:serviceId:HaDevice1', 'BatteryLevel'},
         {'battery_level_percent', 'Battery level as a percentage of its capacity'}
     },
     energy_sensor_counter={

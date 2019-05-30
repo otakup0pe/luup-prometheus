@@ -17,7 +17,7 @@
 
 local DATA = {
     battery_level={
-        {{4}, 'urn:micasaverde-com:serviceId:HaDevice1', 'BatteryLevel'},
+        {{3, 4, 7, 11, 12}, 'urn:micasaverde-com:serviceId:HaDevice1', 'BatteryLevel'},
         {'battery_level_percent', 'Battery level as a percentage of its capacity'}
     },
     energy_sensor_counter={
@@ -33,7 +33,7 @@ local DATA = {
         {'humidity_relative', 'Relative humidity (0..100)'}
     },
     light_sensor={
-        {{18}, 'urn:micasaverde-com:serviceId:LightSensor1', 'CurrentLevel'},
+        {{11, 18}, 'urn:micasaverde-com:serviceId:LightSensor1', 'CurrentLevel'},
         {'light_lux', 'Light level in lux'}
     },
     security_sensor={
@@ -41,7 +41,7 @@ local DATA = {
         {'security_sensor_tripped', 'Integer 1/0 indicating sensor trip'}
     },
     temperature_sensor={
-        {{5, 17}, 'urn:upnp-org:serviceId:TemperatureSensor1', 'CurrentTemperature'},
+        {{4, 5, 17, 666}, 'urn:upnp-org:serviceId:TemperatureSensor1', 'CurrentTemperature'},
         {'temperature_c', 'Temperature in degrees Celsius'}
     },
 

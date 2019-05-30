@@ -46,6 +46,11 @@ controller.
 In UI7, you can do this by navigating to `Apps`, `Develop apps`, `Luup files`
 on your controller’s web interface.
 
+You also need to create a device to instantiate the loaded code in `Apps`,
+`Develop apps`, `Create device` with `Upnp Device Filename` set to
+`D_PrometheusMetrics.xml` and `Description` to `Prometheus Metrics` and
+clicking `Create device` button.
+
 Check that the metrics are being properly exported by pointing your browser or
 a tool like curl to
 

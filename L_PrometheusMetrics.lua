@@ -41,7 +41,7 @@ local DATA = {
         {'security_sensor_tripped', 'Integer 1/0 indicating sensor trip'}
     },
     temperature_sensor={
-        {{4, 5, 17}, 'urn:upnp-org:serviceId:TemperatureSensor1', 'CurrentTemperature'},
+        {{4, 5, 17, 666}, 'urn:upnp-org:serviceId:TemperatureSensor1', 'CurrentTemperature'},
         {'temperature_c', 'Temperature in degrees Celsius'}
     },
 
